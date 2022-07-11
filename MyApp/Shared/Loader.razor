@@ -1,0 +1,34 @@
+﻿@implements IDisposable
+<div class="lds-facebook"><div></div><div></div><div></div></div>
+
+@if (showMessage)
+{
+    @ChildContent
+}
+
+@code{
+    [Parameter] public int TimeoutInMS { get; set; }
+    [Parameter] public RenderFragment ChildContent { get; set; }
+
+    private bool showMessage;
+
+    private System.Threading.CancellationTokenSource ct = new System.Threading.CancellationTokenSource();
+
+    protected override Task OnAfterRenderAsync(bool firstRender)
+    {
+        _ = Task.Delay(TimeoutInMS, ct.Token).ContinueWith(async t =>
+        {
+            if (t.IsCompletedSuccessfully)
+            {
+                showMessage = true;
+                await InvokeAsync(StateHasChanged);
+            }
+        });
+        return base.OnAfterRenderAsync(firstRender);
+    }
+
+    public void Dispose()
+    {
+        ct.Cancel();
+    }
+}

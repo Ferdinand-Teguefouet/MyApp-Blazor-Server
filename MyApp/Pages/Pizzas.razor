@@ -1,0 +1,83 @@
+﻿@page "/pizzas"
+@inherits PizzasBase
+
+<h3>Pizzas</h3>
+
+<!-- zone admin -->
+<span><input type="checkbox" @bind-value="IsAdmin" />&nbsp; Mode admin</span>
+@if (EditingPizza != null)
+{
+    <div class="row">
+        <div class="col">
+            <!-- Formulaire édition pizza -->
+            <EditForm Model="EditingPizza" OnValidSubmit="Close">
+                <DataAnnotationsValidator />
+                <div class="form-group">
+                    <label for="title">Nom</label>
+                    <InputText class="form-control" id="name" placeholder="Nom Pizza" @bind-Value="EditingPizza.Name" required />
+                    <small><ValidationMessage For="() => EditingPizza.Name" /></small>
+                </div>
+                <div class="form-group">
+                    <label for="indredients">Ingrédients (séparer par virgules)</label>
+                    <InputText class="form-control" id="ingredient" placeholder="Ingrédients pizza" @bind-Value="Ingredients" />
+                    <small><ValidationMessage For="() => EditingPizza.Ingredients" /></small>
+                </div>
+                <div class="form-group">
+                    <label for="price">Prix (entier)</label>
+                    <InputNumber class="form-control" id="price" placeholder="pizza-price" @bind-Value="EditingPizza.Price" />
+                    <small><ValidationMessage For="() => EditingPizza.Price" /></small>
+                </div>
+                <button type="submit" class="btn btn-primary">Fermer</button>
+            </EditForm>
+        </div>
+    </div>
+}
+@if (MyPizzas != null)
+{
+    <div class="row">
+        <div class="col-8">
+            <!-- zone liste pizza -->
+            @foreach (var pizza in MyPizzas)
+            {
+                <div class="pizza-item">
+                    <div class="pizza-image" style="background-image:url('/images/@pizza.ImageName')"></div>
+                    <div class="pizza-details">
+                        <div class="pizza-title">@pizza.Name <!-- nom de la pizza --></div>
+                        <div class="pizza-ingredients ">@string.Join(", ", pizza.Ingredients) <!-- ingrédients de la pizza --></div>
+                    </div>
+                    <div>
+                        <div class="pizza-price">@pizza.Price.ToString("0.00") &euro; <!-- prix de la pizza --></div>
+                        <div class="pizza-add-basket" @onclick="() => AddToBasket(pizza)"><i class="fas fa-shopping-basket"></i></div>
+                    </div>
+                    <!-- DEBUT zone édition en admin -->
+                    @if (IsAdmin)
+                    {
+                        <div class="edit-pizza" @onclick="() => EditPizza(pizza)">
+                            <i class="fas fa-edit"></i>
+                        </div>
+                    }
+                    <!-- FIN zone édition en admin -->
+                </div>
+            }
+        </div>
+        <div class="col-4">
+            <!-- zone panier -->
+            <div class="basket">
+                @foreach (var pizzaBasket in Basket)
+                {
+                    <div class="basket">
+                        <!-- template ligne panier -->
+                        <div class="basket-line">
+                            <div class="pizza-title basket-col1">@pizzaBasket.Name<!-- nom pizza --></div>
+                            <div class="pizza-price">@pizzaBasket.Price.ToString("0.00")<!-- prix pizza --></div>
+                            <div class="basket-delete" @onclick="() => RemoveFromBasket(pizzaBasket)"><i class="fas fa-times"></i></div>
+                        </div>
+                        <!-- fin template ligne panier -->
+                    </div>
+                }
+                <div class="basket-total pizza-price">Total : @Basket.Sum(p => p.Price) &euro;</div>
+            </div>
+
+        </div>
+    </div>
+}

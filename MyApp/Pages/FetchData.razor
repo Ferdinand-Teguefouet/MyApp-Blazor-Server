@@ -1,0 +1,41 @@
+﻿@page "/fetchdata"
+
+
+<h1>Weather forecast</h1>
+
+<p>This component demonstrates fetching data from a service.</p>
+
+<input placeholder="dd/MM/yyyy" @bind-value="Date" @bind-value:format="dd/MM/yyyy" />
+<button @onclick="GetForecasts" class="btn btn-primary">Refresh</button>
+
+@if (forecasts == null)
+{
+    <p>
+        <Loader TimeoutInMS="3000">
+            <p>Le chargement prend un peu plus de temps que prévu</p>
+        </Loader>
+    </p>
+    @*<p><em>Loading...</em></p>*@
+}
+else
+{
+    <WeatherTable @bind-Forecasts="forecasts"></WeatherTable>
+}
+
+@code {
+    public DateTime Date { get; set; } = DateTime.Today;
+    [Inject]
+    protected IWeatherForecastService ForecastService { get; set; }
+    private WeatherForecast[] forecasts;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await GetForecasts();
+    }
+
+    protected async Task GetForecasts()
+    {
+        ///await Task.Delay(5000); 
+        forecasts = await ForecastService.GetForecastAsync(Date);
+    }
+}

@@ -1,0 +1,37 @@
+﻿@page "/magicnumber"
+@inherits MagicNumberBase
+
+<h3>Magic Number</h3>
+@if (isWon.HasValue)
+{
+    if (isWon.Value)
+    {
+<h2>Gagn&eacute; 💪 !</h2>
+    }
+    else
+    {
+        <h2>Perdu 😥 !</h2>
+    }
+    <button class="btn btn-primary" @onclick = "() => ResetGame()">Replay</button>
+}
+else
+{
+    <div>
+        <p>Imagine a number between 0 and @maxNumber</p>
+    </div>
+    <div>
+        <form>
+            <input type="number" @bind="magNumberOfUser" />
+            <input type="button" class="btn btn-outline-info" value="Test" @onclick="() => TestMagicNumber()" />
+        </form>
+    </div>
+    <div>
+        @for (int i = 0; i < remainingLife; i++)
+        {
+            <span style="color: orangered; font-size: 60px;">&hearts;&nbsp;</span>
+        }
+    </div>
+}
+
+
+

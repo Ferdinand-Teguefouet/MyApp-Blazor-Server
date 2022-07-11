@@ -1,0 +1,44 @@
+﻿@page "/counter"
+<h3>Counter</h3>
+
+<p>Saisie de la valeur initiale</p>
+
+<input type="number"
+       @onkeypress="KeyPress"
+       @onkeypress:preventDefault="true"
+       @bind-value="initVal" 
+       @bind-value:event="oninput"       
+       />
+
+<CascadingValue Value="initVal" Name="Count">
+    <Counter></Counter>
+</CascadingValue>
+
+@code {
+    private int initVal;
+
+    [Inject] protected IJSRuntime JSRuntime { get; set; }
+
+    public void KeyPress(KeyboardEventArgs e)
+    {
+        if (e.Key == "+")
+        {
+            initVal++;
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var jsValue = await JSRuntime.InvokeAsync<string>("askInitial"); /*"Le nombre reçu du prompt" est un json*/
+            if (int.TryParse(jsValue, out int val))
+            {
+                initVal = val;
+                StateHasChanged();
+            }
+
+        }
+        await base.OnAfterRenderAsync(firstRender);
+    }
+}

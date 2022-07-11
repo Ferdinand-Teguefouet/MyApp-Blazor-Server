@@ -1,0 +1,41 @@
+﻿@page "/dotnet5newforms"
+<h3>Dotnet 5 : Nouveautés Blazor au niveau des formulaires</h3>
+
+<EditForm Model="model" OnValidSubmit="Submit">
+    <InputRadioGroup @bind-Value="model.Tranche" Name="tranche_age">
+        <p>Tranches d'âge :</p>
+        @foreach (var tranche in (TrancheAge[])Enum.GetValues(typeof(TrancheAge)))
+        {
+            <InputRadio Value="tranche"></InputRadio>
+            @tranche.ToString()
+        }
+    </InputRadioGroup><br/>
+    <InputFile OnChange="OnFileChanged" />
+    <p>
+        @fileContent
+    </p>
+    <p>
+        <button type="submit" ></button>
+    </p>
+</EditForm>
+
+
+@code {
+    private DemoModel model = new DemoModel();
+    private string fileContent;
+    private IBrowserFile selectedFile;
+
+    private void OnFileChanged(InputFileChangeEventArgs args)
+    {
+        selectedFile = args.File;
+    }
+
+    private async Task Submit()
+    {
+        var maxSize = 10 * 1024 * 1024; // pour une taille de 10 Mo
+        using var fileStream = selectedFile.OpenReadStream(maxSize);
+        using var reader = new System.IO.StreamReader(fileStream);
+
+        fileContent = await reader.ReadToEndAsync();
+    }
+}
